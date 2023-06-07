@@ -6,8 +6,8 @@ function checkData(data){
         Pays: Joi.string().min(2).max(2).required(),
         Ville: Joi.string().min(5).max(100).required(),
         CP: Joi.string().min(5).max(5).required(),
-        Latitude: Joi.string(),
-        Longitude: Joi.string()
+        Latitude: Joi.string().allow(null, ''),
+        Longitude: Joi.string().allow(null, '')
     });
     const result = schema.validate(data);
 
