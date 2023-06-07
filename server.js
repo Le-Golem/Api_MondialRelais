@@ -1,5 +1,6 @@
 const express = require('express');
-const cryptoJS = require('crypto-js')
+const cryptoJS = require('crypto-js');
+const { checkData } = require('./utils/checkFunction.js');
 
 const app = express();
 const bodyParser = require('body-parser');
@@ -27,53 +28,59 @@ const CreateSecurityKey = (verifiedJSobject) => {
 
 const JStoJSON = JS => JSON.stringify(JS);
 
-
-
-
-
 app.post('/', (req, res) => {
 
-  const requestBody = `<?xml version="1.0" encoding="utf-8"?>
-  <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-    <soap:Body>
-      <WSI4_PointRelais_Recherche xmlns="http://www.mondialrelay.fr/webservice/">
-        <Enseigne>BDTEST13</Enseigne>
-        <Pays>FR</Pays>
-        <CP>38000</CP>
-        <Action>REL</Action>
-        <NombreResultats>1</NombreResultats>
-        <Security>E3B4A63E6FA9DE5098C37755CFB01666</Security>
-      </WSI4_PointRelais_Recherche>
-    </soap:Body>
-  </soap:Envelope>`;
+    console.log(req.body);
+    const verif = checkData(req.body);
 
-  fetch('http://api.mondialrelay.com/Web_Services.asmx?op=WSI4_PointRelais_Recherche', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/xml'
-    },
-    body: requestBody
-  })
-    .then(response => {
-      return response.text();
+    if(verif !== true)
+    {
+        return res.status(400).send({
+            ok: false,
+            msg: verif.details[0].message,
+            });
+    }
+    const requestBody = `<?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+        <WSI4_PointRelais_Recherche xmlns="http://www.mondialrelay.fr/webservice/">
+            <Enseigne>BDTEST13</Enseigne>
+            <Pays>FR</Pays>
+            <CP>38000</CP>
+            <Action>REL</Action>
+            <NombreResultats>1</NombreResultats>
+            <Security>E3B4A63E6FA9DE5098C37755CFB01666</Security>
+        </WSI4_PointRelais_Recherche>
+        </soap:Body>
+    </soap:Envelope>`;
+
+    fetch('http://api.mondialrelay.com/Web_Services.asmx?op=WSI4_PointRelais_Recherche', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'text/xml'
+        },
+        body: requestBody
     })
-    .then(data => {
-      // fonction XML to JSON 
-      parser.parseString(data, (err,result) => {
-        if(err){
-          console.log(err)}
-        try {
-          res.send(util.inspect(result , true , null , false));
-        } catch (error) {
-          res.send(error)
-        }
-      })
+        .then(response => {
+            return response.text();
+        })
+        .then(data => {
+        // fonction XML to JSON 
+        parser.parseString(data, (err,result) => {
+            if(err){
+            console.log(err)}
+            try {
+            res.send(util.inspect(result , true , null , false));
+            } catch (error) {
+            res.send(error)
+            }
+        })
     })
-    .catch(error => {
-      res.status(500).send(error);
+        .catch(error => {
+        res.status(500).send(error);
     });
 });
 
 app.listen(3000, () => {
-  console.log('Serveur démarré sur le port 3000');
+    console.log('Serveur démarré sur le port 3000');
 });
