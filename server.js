@@ -1,4 +1,6 @@
 const express = require('express');
+const cryptoJS = require('crypto-js')
+
 const app = express();
 const bodyParser = require('body-parser');
 const xml2js = require('xml2js');
@@ -7,6 +9,26 @@ const util = require('util');
 const parser = new xml2js.Parser()
 
 app.use(express.json())
+
+
+const MondialRelaiEnseigne = "BDTEST13" // => a ajouter dans requestCompletion 
+const MondialRelaiPrivateKey = "PrivateK"
+
+const CreateSecurityKey = (verifiedJSobject) => {
+
+  let concatenedProperty = '' //MondialRelaiEnseigne
+  for (let property of verifiedJSobject) {
+    concatenedProperty += property.toString()
+  }
+  concatenedProperty += MondialRelaiPrivateKey
+  const key = cryptoJS.MD5(concatenedProperty).toString.toUpperCase()
+  return { ...verifiedJSobject, securityKey: key }
+}
+
+const JStoJSON = JS => JSON.stringify(JS);
+
+
+
 
 
 app.post('/', (req, res) => {
