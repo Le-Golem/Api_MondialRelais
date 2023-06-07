@@ -14,8 +14,6 @@ function checkData(data){
     if (result.error) {
         return result.error;
     }
-
-    return true;
 }
 
 exports.checkData = checkData;
