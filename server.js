@@ -1,8 +1,13 @@
-const express = require('express')
+const express = require('express');
 const app = express();
-app.use(express.json())
 const bodyParser = require('body-parser');
-app.use(bodyParser.text({ type: 'text/xml' }));
+const Joi = require('joi');
+const xml2js = require('xml2js');
+const util = require('util');
+
+const parser = new xml2js.Parser()
+
+app.use(express.json())
 
 app.post('/', (req, res) => {
 
@@ -28,11 +33,14 @@ app.post('/', (req, res) => {
     body: requestBody
   })
     .then(response => {
-      // Traiter la réponse
       return response.text();
     })
     .then(data => {
-      res.send(data);
+      console.log(data)
+      // fonction XML to JSON 
+      parser.parseString(data, (err,result) => {
+        res.send(util.inspect(result , false , null , false));
+      })
     })
     .catch(error => {
       console.error(error);
