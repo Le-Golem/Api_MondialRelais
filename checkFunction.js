@@ -26,3 +26,5 @@ function checkData(data){
 
     return true;
 }
+
+exports.checkData = checkData;
