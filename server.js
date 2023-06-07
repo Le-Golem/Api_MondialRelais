@@ -30,7 +30,6 @@ const JStoJSON = JS => JSON.stringify(JS);
 
 app.post('/', (req, res) => {
 
-    console.log(req.body);
     const verif = checkData(req.body);
 
     if(verif !== true)
@@ -38,7 +37,7 @@ app.post('/', (req, res) => {
         return res.status(400).send({
             ok: false,
             msg: verif.details[0].message,
-            });
+        });
     }
     const requestBody = `<?xml version="1.0" encoding="utf-8"?>
     <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
