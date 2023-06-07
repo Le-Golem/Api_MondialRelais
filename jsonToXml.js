@@ -53,3 +53,5 @@ const footerXml = `
 
 const xmlMessage = jsonToXml(jsonMessage, headerXml, footerXml);
 console.log(xmlMessage);
+
+module.exports = jsonToXml;
