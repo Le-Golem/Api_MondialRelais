@@ -55,16 +55,27 @@ function buildXml(parent, data) {
   }
 }
 
+/**
+ *   Ci-dessous de quoi tester : node toXml.js
+ */
+
+
 // Exemple d'utilisation
-const Message = {
-  pays: "FR",
-  CP: "38000",
-  ACTION: "REL"
-};
+// const Message = {
+//   pays: "FR",
+//   CP: "38000",
+//   ACTION: "REL"
+// };
 
 
+/**
+ * Voici l'ecriture de la fonction
+ * Ici, enlever le commentaire pour tester node toXml.js
+ */
 
-const xmlMessage = toXml(Message);
-console.log(xmlMessage);
+// const xmlMessage = toXml(Message);
+// console.log(xmlMessage);
 
+
+//pour l'export
 module.exports = toXml;
