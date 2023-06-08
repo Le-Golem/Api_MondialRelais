@@ -1,6 +1,6 @@
 
 const express = require('express');
-const cryptoJS = require('crypto-js');
+// const cryptoJS = require('crypto-js');
 const app = express();
 const bodyParser = require('body-parser');
 const xml2js = require('xml2js');
@@ -9,49 +9,6 @@ const parser = new xml2js.Parser()
 
 const MondialRelaiEnseigne = "BDTEST13" // => a ajouter dans requestCompletion 
 const MondialRelaiPrivateKey = "PrivateK"
-
-const CreateSecurityKey = (verifiedJSobject) => {
-
-    const orderPropertyArray = ["Enseigne", "Pays", "NumPointRelais", "Ville", "CP", "Latitude", "Longitude", "Taille", "Poids", "Action", "DelaiEnvoi", "RayonRecherche", "TypeActivite", "NombreResultats", "Security"];
-
-    let concatenedProperty = '' //MondialRelaiEnseigne
-    const valueArray = {}
-
-    for (let property in verifiedJSobject) {
-        const value = verifiedJSobject[property]
-        valueArray[property] = value.toString()
-    }
-
-    for (let key of orderPropertyArray) {
-        for (let key2 in valueArray) {
-            if (key == key2) {
-                concatenedProperty += valueArray[key]
-            }
-        }
-    }
-
-
-    console.log(concatenedProperty)
-    const key = cryptoJS.MD5(concatenedProperty).toString().toUpperCase()
-    console.log(key)
-    return { ...verifiedJSobject, Security: key }
-}
-
-const requestCompletion = (jsRequest) => {
-
-    const MondialRelaiConst = {
-        Enseigne: "BDTEST13",
-        Action: "REL",
-        Security: "PrivateK"
-    }
-
-
-    return {
-        ...MondialRelaiConst,
-        ...jsRequest,
-    }
-}
-
 
 
 
@@ -68,7 +25,7 @@ module.exports = {
         //         msg: verif.details[0].message,
         //     });
         // }
-        const requestBody = toXML()
+        const requestBody = req.body
 
         fetch('http://api.mondialrelay.com/Web_Services.asmx?op=WSI4_PointRelais_Recherche', {
             method: 'POST',
@@ -87,7 +44,7 @@ module.exports = {
                         console.log(err)
                     }
                     try {
-                        res.send(util.inspect(result, true, null, false));
+                        res.send(result);
                     } catch (error) {
                         res.send(error)
                     }
@@ -98,3 +55,4 @@ module.exports = {
             });
     }
 }
+
