@@ -1,6 +1,6 @@
 
 const express = require('express');
-const cryptoJS = require('crypto-js');
+// const cryptoJS = require('crypto-js');
 const app = express();
 const bodyParser = require('body-parser');
 const xml2js = require('xml2js');
@@ -42,26 +42,23 @@ const JStoJSON = JS => JSON.stringify(JS);
 
 module.exports = {
 
-    getData(req , res) {
+    getData(req, res) {
 
-        const requestBody = `<?xml version="1.0" encoding="utf-8"?>
-        <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-            <soap:Body>
-            <WSI4_PointRelais_Recherche xmlns="http://www.mondialrelay.fr/webservice/">
-                <Enseigne>BDTEST13</Enseigne>
-                <Pays>FR</Pays>
-                <CP>38000</CP>
-                <Action>REL</Action>
-                <NombreResultats>1</NombreResultats>
-                <Security>E3B4A63E6FA9DE5098C37755CFB01666</Security>
-            </WSI4_PointRelais_Recherche>
-            </soap:Body>
-        </soap:Envelope>`;
-    
+        // const verif = checkData(req.body);
+
+        // if(verif !== true)
+        // {
+        //     return res.status(400).send({
+        //         ok: false,
+        //         msg: verif.details[0].message,
+        //     });
+        // }
+        const requestBody = req.body
+
         fetch('http://api.mondialrelay.com/Web_Services.asmx?op=WSI4_PointRelais_Recherche', {
             method: 'POST',
             headers: {
-            'Content-Type': 'text/xml'
+                'Content-Type': 'text/xml'
             },
             body: requestBody
         })
@@ -82,7 +79,8 @@ module.exports = {
             })
         })
             .catch(error => {
-            res.status(500).send(error);
-        });
+                res.status(500).send(error);
+            });
     }
 }
+
