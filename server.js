@@ -6,6 +6,9 @@ const app = express();
 const bodyParser = require('body-parser');
 const xml2js = require('xml2js');
 const util = require('util');
+const toXml = require('./toXml.js');
+const JStoXML = require('./toXml.js');
+
 
 const parser = new xml2js.Parser()
 
@@ -16,7 +19,8 @@ const MondialRelaiPrivateKey = "PrivateK"
 
 const MondialRelaiConst = {
   Enseigne: "BDTEST13",
-  Action: "REL"
+  Action: "REL",
+  Security: "PrivateK"
 }
 
 
@@ -30,18 +34,30 @@ const requestCompletion = (jsRequest) => {
 
 const CreateSecurityKey = (verifiedJSobject) => {
 
+  const orderPropertyArray = ["Enseigne", "Pays", "NumPointRelais", "Ville", "CP", "Latitude", "Longitude", "Taille", "Poids", "Action", "DelaiEnvoi", "RayonRecherche", "TypeActivite", "NombreResultats", "Security"];
+
   let concatenedProperty = '' //MondialRelaiEnseigne
+  const valueArray = {}
+
   for (let property in verifiedJSobject) {
-    concatenedProperty += property.toString()
+    const value = verifiedJSobject[property]
+    valueArray[property] = value.toString()
   }
-  concatenedProperty += MondialRelaiPrivateKey
+
+  for (let key of orderPropertyArray) {
+    for (let key2 in valueArray) {
+      if (key == key2) {
+        concatenedProperty += valueArray[key]
+      }
+    }
+  }
+
+
+  console.log(concatenedProperty)
   const key = cryptoJS.MD5(concatenedProperty).toString().toUpperCase()
-  return { ...verifiedJSobject, securityKey: key }
+  console.log(key)
+  return { ...verifiedJSobject, Security: key }
 }
-
-const jsonToJS = json => JSON.parse(json)
-
-const JStoJson = JS => JSON.stringify(JS);
 
 app.post('/', (req, res) => {
 
@@ -54,20 +70,24 @@ app.post('/', (req, res) => {
     });
   }
 
-
-  console.log("1", req.body)
+  // console.log("1", req.body)
 
   let JSrequest = requestCompletion(req.body)
 
-  console.log("2", JSrequest)
+  // console.log("2", JSrequest)
 
   JSrequest = CreateSecurityKey(JSrequest)
 
-  console.log("3", JSrequest)
+  // console.log("3", JSrequest)
 
 
 
-  const requestBody = ""   // TODO convert JSREQUEST TO XML 
+
+
+  const requestBody = JStoXML(JSrequest)   // TODO convert JSREQUEST TO XML 
+
+  console.log("4", requestBody)
+
 
   fetch('http://api.mondialrelay.com/Web_Services.asmx?op=WSI4_PointRelais_Recherche', {
     method: 'POST',

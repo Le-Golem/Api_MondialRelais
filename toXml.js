@@ -1,81 +1,36 @@
-
-//npm i xmlbuilder
-const xmlbuilder = require('xmlbuilder');
+const builder = require('xmlbuilder');
 
 
-/**
- * Convertit un objet JavaScript en une chaîne XML.
- * @param {Object} data - L'objet JavaScript à convertir en XML.
- * @returns {string} - La chaîne XML résultante.
- */
-function toXml(data) {
-const headerXml = `<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <soap:Body>
-        <WSI3_PointRelais_RechercheResponse xmlns="http://www.mondialrelay.fr/webservice/">
-            <WSI3_PointRelais_RechercheResult>
-                <STAT>0</STAT>
-                <PointsRelais>
-                    `;
+const JStoXML = (JSrequest) => {
 
-const footerXml = `
-</PointsRelais>
-</WSI3_PointRelais_RechercheResult>
-</WSI3_PointRelais_RechercheResponse>
-</soap:Body>
-</soap:Envelope>`;
-  const xmlContent = convertToXml(data);
-  const xmlMessage = `${headerXml}\n${xmlContent}\n${footerXml}`;
-  return xmlMessage;
-}
+  // Create the XML document
+  const xml = builder.create('soap:Envelope', { version: '1.0', encoding: 'utf-8' })
+    .att('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
+    .att('xmlns:xsd', 'http://www.w3.org/2001/XMLSchema')
+    .att('xmlns:soap', 'http://schemas.xmlsoap.org/soap/envelope/');
 
-function convertToXml(data) {
-  const root = xmlbuilder.create('PointRelais_Details');
-  buildXml(root, data);
-  return root.end({ pretty: true });
-}
+  // Add the soap:Body element
+  const body = xml.ele('soap:Body');
 
-/**
- * Construit la structure XML en parcourant l'objet JavaScript récursivement.
- * @param {Object} parent - L'élément parent XML à construire.
- * @param {Object} data - L'objet JavaScript contenant les données pour la construction XML.
- */
-function buildXml(parent, data) {
-  for (let key in data) {
-    if (data.hasOwnProperty(key)) {
-      const value = data[key];
+  // Add the WSI3_PointRelais_Recherche element
+  const wsiElement = body.ele('WSI3_PointRelais_Recherche', { xmlns: 'http://www.mondialrelay.fr/webservice/' });
 
-      if (typeof value === 'object') {
-        const child = parent.ele(key);
-        buildXml(child, value);
-      } else {
-        parent.ele(key, value);
-      }
-    }
+
+  for (const property in JSrequest) {
+    // Get the value of the property
+    const value = JSrequest[property];
+
+    // Add the property element with its value
+    wsiElement.ele(property, value);
   }
+
+  // Convert the XML document to string
+  const xmlString = xml.end({ pretty: true });
+
+  console.log(xmlString);
+
+  return xmlString
 }
-
-/**
- *   Ci-dessous de quoi tester : node toXml.js
- */
-
-
-// Exemple d'utilisation
-// const Message = {
-//   pays: "FR",
-//   CP: "38000",
-//   ACTION: "REL"
-// };
-
-
-/**
- * Voici l'ecriture de la fonction
- * Ici, enlever le commentaire pour tester node toXml.js
- */
-
-// const xmlMessage = toXml(Message);
-// console.log(xmlMessage);
-
 
 //pour l'export
-module.exports = toXml;
+module.exports = JStoXML;
