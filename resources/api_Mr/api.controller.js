@@ -10,7 +10,35 @@ const parser = new xml2js.Parser()
 const MondialRelaiEnseigne = "BDTEST13" // => a ajouter dans requestCompletion 
 const MondialRelaiPrivateKey = "PrivateK"
 
+const CreateSecurityKey = (verifiedJSobject) => {
 
+  let concatenedProperty = '' //MondialRelaiEnseigne
+  for (let property of verifiedJSobject) {
+    concatenedProperty += property.toString()
+  }
+  concatenedProperty += MondialRelaiPrivateKey
+  const key = cryptoJS.MD5(concatenedProperty).toString.toUpperCase()
+  return { ...verifiedJSobject, securityKey: key }
+}
+function removeArrayBrackets(obj) {
+    if (Array.isArray(obj)) {
+      if (obj.length === 1) {
+        return removeArrayBrackets(obj[0]);
+      }
+      return obj.map(item => removeArrayBrackets(item));
+    } else if (typeof obj === 'object') {
+      if (obj.hasOwnProperty('string')) {
+        obj.Horaire = obj.string;
+        delete obj.string;
+      }
+      for (const key in obj) {
+        obj[key] = removeArrayBrackets(obj[key]);
+      }
+    }
+    return obj;
+  }
+  
+const JStoJSON = JS => JSON.stringify(JS);
 
 module.exports = {
 
@@ -38,18 +66,18 @@ module.exports = {
                 return response.text();
             })
             .then(data => {
-                // fonction XML to JSON 
-                parser.parseString(data, (err, result) => {
-                    if (err) {
-                        console.log(err)
-                    }
-                    try {
-                        res.send(result);
-                    } catch (error) {
-                        res.send(error)
-                    }
-                })
+            // fonction XML to JSON 
+            parser.parseString(data, (err,result) => {
+                if(err){
+                console.log(err)}
+                try {
+                const cleanedObject = removeArrayBrackets(result);
+                res.json(cleanedObject);
+                } catch (error) {
+                res.send(error)
+                }
             })
+        })
             .catch(error => {
                 res.status(500).send(error);
             });
