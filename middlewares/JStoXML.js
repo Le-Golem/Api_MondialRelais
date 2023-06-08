@@ -1,4 +1,3 @@
-
 const builder = require('xmlbuilder');
 
 module.exports = (req, res, next) => {
