@@ -20,22 +20,30 @@ const CreateSecurityKey = (verifiedJSobject) => {
   const key = cryptoJS.MD5(concatenedProperty).toString.toUpperCase()
   return { ...verifiedJSobject, securityKey: key }
 }
-
+function removeArrayBrackets(obj) {
+    if (Array.isArray(obj)) {
+      if (obj.length === 1) {
+        return removeArrayBrackets(obj[0]);
+      }
+      return obj.map(item => removeArrayBrackets(item));
+    } else if (typeof obj === 'object') {
+      if (obj.hasOwnProperty('string')) {
+        obj.Horaire = obj.string;
+        delete obj.string;
+      }
+      for (const key in obj) {
+        obj[key] = removeArrayBrackets(obj[key]);
+      }
+    }
+    return obj;
+  }
+  
 const JStoJSON = JS => JSON.stringify(JS);
 
 module.exports = {
 
     getData(req , res) {
 
-        // const verif = checkData(req.body);
-
-        // if(verif !== true)
-        // {
-        //     return res.status(400).send({
-        //         ok: false,
-        //         msg: verif.details[0].message,
-        //     });
-        // }
         const requestBody = `<?xml version="1.0" encoding="utf-8"?>
         <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
             <soap:Body>
@@ -66,7 +74,8 @@ module.exports = {
                 if(err){
                 console.log(err)}
                 try {
-                res.send(util.inspect(result , true , null , false));
+                const cleanedObject = removeArrayBrackets(result);
+                res.json(cleanedObject);
                 } catch (error) {
                 res.send(error)
                 }
