@@ -33,7 +33,7 @@ module.exports = (req, res, next) => {
 
     const body = req.body
 
-    req.body = { ...body, Security: key }
+    req.body = { ...body, security: key }
 
     next();
 }
