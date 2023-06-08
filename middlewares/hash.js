@@ -2,7 +2,6 @@ const cryptoJS = require('crypto-js');
 
 module.exports = (req, res, next) => {
 
-
     const orderPropertyArray = ["Enseigne", "Pays", "NumPointRelais", "Ville", "CP", "Latitude", "Longitude", "Taille", "Poids", "Action", "DelaiEnvoi", "RayonRecherche", "TypeActivite", "NombreResultats", "Security"];
 
     let concatenedProperty = '' //MondialRelaiEnseigne
@@ -15,19 +14,15 @@ module.exports = (req, res, next) => {
 
     console.log("value array ", valueArray)
 
-
-
-
     for (let key of orderPropertyArray) {
         for (let key2 in valueArray) {
-            if (key == key2) {
+            if (key.toUpperCase() == key2.toUpperCase()) {
                 concatenedProperty += valueArray[key]
             }
         }
     }
 
     console.log("concat  ", concatenedProperty)
-
 
     const key = cryptoJS.MD5(concatenedProperty).toString().toUpperCase()
 
